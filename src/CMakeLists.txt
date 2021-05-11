@@ -9,7 +9,7 @@ set(implementation
 	Translate.cpp
 )
 
-add_executable(translate_cpp STATIC
+add_executable(translate_cpp
     ${implementation}
     ${headers}
 )
