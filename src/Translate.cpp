@@ -1,5 +1,3 @@
-// Juergen Schmidt 2021
-
 #include <iostream>
 #include <string>
 #include <vector>
