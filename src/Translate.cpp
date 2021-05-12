@@ -17,7 +17,7 @@ namespace {
      * E.g. 123456, pack size 3: (123)(456).
      * E.g. 123456, pack size 2: (12)(34)(56).
      */
-    auto get_digit_packs(long number, int pack_size = 3, int base = 10) -> auto
+    auto get_digit_packs(unsigned long number, int pack_size = 3, int base = 10) -> auto
     {
         if ( number == 0 )
             return vector<int>{};
@@ -38,7 +38,7 @@ namespace {
      * Convert a decimal number with a maximum of three digits to
      * a string.
      */
-    auto number_triple_to_word(int number) -> string
+    auto number_triple_to_word(unsigned int number) -> string
     {
         if (number > 999)
             throw std::invalid_argument( std::to_string(number) );
@@ -146,7 +146,7 @@ namespace {
     }
 
     // https://www.korrekturen.de/zahlwort/numeralia.shtml
-    string triple_names(int triple, int triple_size)
+    auto triple_names(int triple, int triple_size) -> string
     {
         switch (triple) {
         case 0:
@@ -226,7 +226,6 @@ namespace {
         return result;
     }
 }
-
 
 int main()
 {
