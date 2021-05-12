@@ -1,9 +1,24 @@
+/*
+ * Implement a command line program that accepts a single number and prints 
+ * this number textually in German or English language to standard out.
+ *
+ * Examples:
+ * >translate 1
+ * Eins
+ * >translate 313
+ * Dreihundertdreizehn
+ * >translate 2000000
+ * Zwei millionen
+ * >translate 1234011
+ * Eine million zweihundertvierunddreißig tausend elf
+ *
+ */
 
+#include <cmath>
 #include <iostream>
+#include <stdexcept>
 #include <string>
 #include <vector>
-#include <cmath>
-#include <stdexcept>
 
 namespace {
 
@@ -11,10 +26,10 @@ using std::string;
 using std::vector;
 
 /**
-    * Split the passed number in packets of digits of a certain size.
-    * E.g. 123456, pack size 3: (123)(456).
-    * E.g. 123456, pack size 2: (12)(34)(56).
-    */
+ * Split the passed number in packets of digits of a certain size.
+ * E.g. 123456, pack size 3: (123)(456).
+ * E.g. 123456, pack size 2: (12)(34)(56).
+ */
 auto get_digit_packs(unsigned long number, int pack_size = 3, int base = 10) -> auto
 {
     if (number == 0)
@@ -33,9 +48,9 @@ auto get_digit_packs(unsigned long number, int pack_size = 3, int base = 10) -> 
 }
 
 /**
-    * Convert a decimal number with a maximum of three digits to
-    * a string.
-    */
+ * Convert a decimal number with a maximum of three digits to
+ * a string.
+ */
 auto number_triple_to_word(unsigned int number) -> string
 {
     if (number > 999)
@@ -53,7 +68,7 @@ auto number_triple_to_word(unsigned int number) -> string
 
         result.append("hundert");
             
-        // If second pair is zero we are done. Otherwise
+        // If the second pair is zero we are done. Otherwise
         // translate this as well.
 
         if ( pairs[1] != 0 )
@@ -171,8 +186,8 @@ auto triple_names(int triple, int triple_size) -> string
 }
 
 /**
-    * Convert the passed number to its German textual representation.
-    */
+ * Convert the passed number to its German textual representation.
+ */
 std::string translate(long number)
 {
     if ( number == 0 )
@@ -226,6 +241,9 @@ std::string translate(long number)
 
 }
 
+/**
+ * Entry point.  Accept a single required argument from the command line. 
+ */
 int main(int argc, char**argv)
 {
 #if 1
