@@ -13,7 +13,9 @@ using namespace std;
 namespace {
 
     /**
-     *  
+     * Split the passed number in packets of digits of a certain size.
+     * E.g. 123456, pack size 3: (123)(456).
+     * E.g. 123456, pack size 2: (12)(34)(56).
      */
     auto get_digit_packs(long number, int pack_size = 3, int base = 10) -> auto
     {
@@ -32,6 +34,10 @@ namespace {
         return result;
     }
 
+    /**
+     * Convert a decimal number with a maximum of three digits to
+     * a string.
+     */
     auto number_triple_to_word(int number) -> string
     {
         if (number > 999)
@@ -72,7 +78,7 @@ namespace {
         case 4:
             return "vier";
         case 5:
-            return "fünf";
+            return "fÃ¼nf";
         case 6:
             return "sechs";
         case 7:
@@ -86,15 +92,29 @@ namespace {
         case 11:
             return "elf";
         case 12:
-            return "zwölf";
+            return "zwÃ¶lf";
+        case 13:
+            return "dreizehn";
+        case 14:
+            return "vierzehn";
+        case 15:
+            return "fÃ¼nfzehn";
+        case 16:
+            return "sechzehn";
+        case 17:
+            return "siebzehn";
+        case 18:
+            return "achtzehn";
+        case 19:
+            return "neunzehn";
         case 20:
             return "zwanzig";
         case 30:
-            return "dreissig";
+            return "dreiÃŸig";
         case 40:
             return "vierzig";
         case 50:
-            return "fünfzig";
+            return "fÃ¼nfzig";
         case 60:
             return "sechzig";
         case 70:
@@ -105,12 +125,12 @@ namespace {
             return "neunzig";
         }
 
-        // Remaining are the two digit numbers.
+        // Remaining are the two-digit numbers.
         auto singles = get_digit_packs(pairs[0], 1);
 
         string result;
         
-        // Oh this special case.
+        // Oh, this special case.
         if (singles[1] == 1 && singles[0] != 0 )
             result.append("ein");
         else
@@ -152,21 +172,54 @@ namespace {
         }
     }
 
+    /**
+     * Convert the passed number to its German textual representation.
+     */
     std::string translate(long number)
     {
-        auto triple_groups = get_digit_packs(number);
-
-        auto group_number = triple_groups.size() -2;
+        if ( number == 0 )
+            return number_triple_to_word( number );
 
         string result;
 
+        if ( number < 0 )
+        {
+            result = "minus ";
+            number = -number;
+        }
+
+        // Split the number in its triple-digit-groups.
+        auto triple_groups = 
+            get_digit_packs(number);
+
+        int group_number = 
+            triple_groups.size();
+
+        // Loop over the triple-digit-groups, translate each and
+        // place the group-name (million, milliarde, etc.) in between.
         for (auto c : triple_groups)
         {
-            result.append(number_triple_to_word(c));
+            group_number--;
+
+            // If triple pack is empty, we skip this altogether. (1000011)
+            if ( c == 0 )
+                continue;
+            // The 1 case for tausend. (1000)
+            else if ( c == 1 && group_number == 1 )
+                result.append("ein");
+            // The remaining 1 cases.
+            else if ( c == 1 && group_number > 1 )
+                result.append("eine");
+            // The regular case.
+            else
+                result.append(number_triple_to_word(c));
+
             result.append(" ");
+
+            // Place the triple name between all packs but not after the last.
             if (group_number > 0) {
-                result.append(triple_names(group_number, c));
-                group_number--;
+                result.append(triple_names(group_number-1, c));
+                result.append(" ");
             }
         }
 
@@ -179,36 +232,29 @@ int main()
 {
   cout << "e for exit." << endl;
 
-  ConvertNumberToWord convertNumberToWord;
-  string input = "";
+  string input;
 
   while (input.compare("e") != 0)
   {
-
     cout << ">translate ";
 
     input = "           ";
     cin >> input;
     string output;
 
-#if 0
-    output = convertNumberToWord.convertInToOut(input);
-    cout << input << " = " << output << endl;
-#endif
-
     try {
-        auto the_number = std::strtol(input.c_str(), nullptr, 10);
-
-        auto digit_packs = get_digit_packs(
-            the_number );
-
-        for (auto c : digit_packs)
-            cout << c << "\n";
+        char* unprocessed;
+        auto the_number = std::strtol(
+            input.c_str(),
+             &unprocessed,
+             10);
+        if (*unprocessed)
+            throw std::invalid_argument( input );
 
         cout << translate(the_number) << "\n";
     }
     catch (std::exception& e) {
-        cout << "Cold not convert to number: " << input << "\n";
+        cout << "Not convertible: " << input << "\n";
     }
   }
 

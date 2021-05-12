@@ -110,7 +110,7 @@ string ConvertNumberToWord::threeNumbersToWord(char char1, char char2, char char
   else if (char2 == '1' && char3 == '2')
   {
 
-    tennerWord = "zwölf";
+    tennerWord = "zwï¿½lf";
 
   }
   else if (char2 == '1' && char3 == '7')
@@ -209,7 +209,7 @@ string ConvertNumberToWord::oneNumberToWordOnner(char charIn, int position)
   else if (charIn == '5')
   {
 
-    oneer = "fünf";
+    oneer = "fuenf";
 
   }
   else if (charIn == '6')
@@ -262,7 +262,7 @@ string ConvertNumberToWord::oneNumberToWordTenner(char charIn)
   else if (charIn == '3')
   {
 
-    tenner = "dreißig";
+    tenner = "dreiÃŸig";
 
   }
   else if (charIn == '4')
@@ -274,7 +274,7 @@ string ConvertNumberToWord::oneNumberToWordTenner(char charIn)
   else if (charIn == '5')
   {
 
-    tenner = "fünfzig";
+    tenner = "fÃ¼nfzig";
 
   }
   else if (charIn == '6')
@@ -314,20 +314,21 @@ string ConvertNumberToWord::clnstr(string Input)
   {
     switch (Input[i])
     {
-    case 'ä': Input[i] = 0x84;
-      break;
-    case 'ö': Input[i] = 0x94;
-      break;
-    case 'ü': Input[i] = 0x81;
-      break;
-    case 'Ä': Input[i] = 0x8E;
-      break;
-    case 'Ö': Input[i] = 0x99;
-      break;
-    case 'Ü': Input[i] = 0x9A;
-      break;
-    case 'ß': Input[i] = 0xE1;
-      break;
+    // Encoding fails on Mac.
+    // case 'ï¿½': Input[i] = 0x84;
+    //   break;
+    // case 'ï¿½': Input[i] = 0x94;
+    //   break;
+    // case 'ï¿½': Input[i] = 0x81;
+    //   break;
+    // case 'ï¿½': Input[i] = 0x8E;
+    //   break;
+    // case 'ï¿½': Input[i] = 0x99;
+    //   break;
+    // case 'ï¿½': Input[i] = 0x9A;
+    //   break;
+    // case 'ï¿½': Input[i] = 0xE1;
+    //   break;
     default: break;
     }
   }
