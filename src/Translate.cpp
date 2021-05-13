@@ -11,7 +11,6 @@
  * Zwei millionen
  * >translate 1234011
  * Eine million zweihundertvierunddreißig tausend elf
- *
  */
 
 #include <cmath>
@@ -30,7 +29,7 @@ using std::vector;
  * E.g. 123456, pack size 3: (123)(456).
  * E.g. 123456, pack size 2: (12)(34)(56).
  */
-auto get_digit_packs(unsigned long number, int pack_size = 3, int base = 10) -> auto
+auto get_digit_packs(unsigned long number, int pack_size, int base = 10) -> auto
 {
     if (number == 0)
         return vector<int>{};
@@ -41,43 +40,17 @@ auto get_digit_packs(unsigned long number, int pack_size = 3, int base = 10) -> 
     auto current_pack =
         number % divisor;
     auto result =
-        get_digit_packs(number / divisor);
+        get_digit_packs(number / divisor, pack_size);
     result.push_back(current_pack);
 
     return result;
 }
 
 /**
- * Convert a decimal number with a maximum of three digits to
- * a string.
+ * Convert a decimal number with a single digit to a string.
  */
-auto number_triple_to_word(unsigned int number) -> string
+auto number_digit_to_word(unsigned int number) -> string
 {
-    if (number > 999)
-        throw std::invalid_argument( std::to_string(number) );
-
-    auto pairs = get_digit_packs(number, 2);
-
-    if (pairs.size() > 1) {
-        string result;
-
-        if (pairs[0] == 1)
-            result.append("ein");
-        else
-            result.append(number_triple_to_word(pairs[0]));
-
-        result.append("hundert");
-            
-        // If the second pair is zero we are done. Otherwise
-        // translate this as well.
-
-        if ( pairs[1] != 0 )
-            result.append(number_triple_to_word(pairs[1]));
-
-        return result;
-    }
-
-    // Base translation for single digits and special cases.
     switch (number)
     {
     case 0:
@@ -100,6 +73,25 @@ auto number_triple_to_word(unsigned int number) -> string
         return "acht";
     case 9:
         return "neun";
+    default:
+        throw std::domain_error(std::to_string(number) + ">9");
+    }
+}
+
+/**
+ * Convert a decimal number with a maximum of two digits to
+ * a string.
+ */
+auto number_pair_to_word(unsigned int number) -> string
+{
+    if (number > 99)
+        throw std::domain_error(std::to_string(number) + ">99");
+    else if (number < 10)
+        return number_digit_to_word(number);
+
+    // Base translation for single digits and special cases.
+    switch (number)
+    {
     case 10:
         return "zehn";
     case 11:
@@ -138,24 +130,61 @@ auto number_triple_to_word(unsigned int number) -> string
         return "neunzig";
     }
 
-    // Remaining are the two-digit numbers.
-    auto singles = get_digit_packs(pairs[0], 1);
+    // Remaining are systematic two-digit numbers.
+    auto singles = get_digit_packs(number, 1);
 
     string result;
         
     // Oh, this special case.
-    if (singles[1] == 1 && singles[0] != 0 )
+    if (singles[1] == 1 && singles[0] != 0)
         result.append("ein");
     else
-        result.append( number_triple_to_word(singles[1]) );
+        result.append( number_digit_to_word(singles[1]) );
 
     if (singles[0] > 0)
     {
         result.append("und");
-        result.append(number_triple_to_word(singles[0]*10));
+        result.append(number_pair_to_word(singles[0]*10));
     }
 
     return result;
+}
+
+/**
+ * Convert a decimal number with a maximum of three digits to
+ * a string.
+ */
+auto number_triple_to_word(unsigned int number) -> string
+{
+    if (number > 999)
+        throw std::domain_error(std::to_string(number) + ">999" );
+
+    auto pairs = get_digit_packs(number, 2);
+
+    if (pairs.size() == 0) {
+        // Number was zero.
+        return number_pair_to_word( number );
+    }    
+    else if (pairs.size() > 1) {
+        string result;
+
+        if (pairs[0] == 1)
+            result.append("ein");
+        else
+            result.append(number_pair_to_word(pairs[0]));
+
+        result.append("hundert");
+            
+        // If the second pair is zero we are done. Otherwise
+        // translate this as well.
+
+        if ( pairs[1] != 0 )
+            result.append(number_pair_to_word(pairs[1]));
+
+        return result;
+    }
+
+    return number_pair_to_word( pairs[0] );
 }
 
 // https://www.korrekturen.de/zahlwort/numeralia.shtml
@@ -191,7 +220,7 @@ auto triple_names(int triple, int triple_size) -> string
 std::string translate(long number)
 {
     if ( number == 0 )
-        return number_triple_to_word( number );
+        return number_pair_to_word( number );
 
     string result;
 
@@ -201,9 +230,9 @@ std::string translate(long number)
         number = -number;
     }
 
-    // Split the number in its triple-digit-groups.
+    // Split the number into its triple-digit-groups.
     auto triple_groups = 
-        get_digit_packs(number);
+        get_digit_packs(number, 3);
 
     int group_number = 
         triple_groups.size();
@@ -260,16 +289,20 @@ int main(int argc, char**argv)
         auto the_number = std::stol(
             input,
             &unprocessed);
+
         if (unprocessed < input.size())
             throw std::invalid_argument(input);
 
         std::cout << translate(the_number) << "\n";
     }
-    catch (std::out_of_range& e) {
+    catch (const std::out_of_range& e) {
         std::cout << "Out of range: " << input << "\n";
     }
-    catch (std::exception& e) {
+    catch (const std::invalid_argument& e) {
         std::cout << "Not convertible: " << input << "\n";
+    }
+    catch (const std::exception& e) {
+        std::cout << "Unexpected error: " << e.what() << "\n";
     }
 
 #else
