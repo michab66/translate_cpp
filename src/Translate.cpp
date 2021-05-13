@@ -89,7 +89,7 @@ auto number_pair_to_word(unsigned int number) -> string
     else if (number < 10)
         return number_digit_to_word(number);
 
-    // Base translation for single digits and special cases.
+    // Translation for special cases.
     switch (number)
     {
     case 10:
@@ -268,22 +268,8 @@ std::string translate(long number)
     return result;
 }
 
-}
-
-/**
- * Entry point.  Accept a single required argument from the command line. 
- */
-int main(int argc, char**argv)
+auto processInput(string input) -> int
 {
-#if 1
-    if (argc != 2)
-    {
-        std::cerr << "Expect number." << std::endl;
-        return 1;
-    }
-
-    std::string input{ argv[1] };
-
     try {
         size_t unprocessed;
         auto the_number = std::stol(
@@ -294,6 +280,8 @@ int main(int argc, char**argv)
             throw std::invalid_argument(input);
 
         std::cout << translate(the_number) << "\n";
+
+        return 0;
     }
     catch (const std::out_of_range& e) {
         std::cout << "Out of range: " << input << "\n";
@@ -305,36 +293,35 @@ int main(int argc, char**argv)
         std::cout << "Unexpected error: " << e.what() << "\n";
     }
 
-#else
-  while (true)
-  {
-    std::cout << "> ";
+    return 1;
+}
 
-    std::string input;
+}
 
-    std::getline(std::cin, input);
+/**
+ * Entry point.  Accept a single required argument from the command line or
+ * enter a read-eval-print loop.
+ */
+int main(int argc, char**argv)
+{
+    if (argc == 2)
+        return processInput(argv[1]);
 
-    if (input.empty())
-        return 0;
+    std::cout << "Enter an integer number or enter to quit.\n";
 
-    try {
-        size_t unprocessed;
-        auto the_number = std::stol(
-            input,
-             &unprocessed );
-        if (unprocessed < input.size())
-            throw std::invalid_argument( input );
+    while (true)
+    {
+        std::cout << "> ";
 
-        std::cout << translate(the_number) << "\n";
+        std::string input;
+
+        std::getline(std::cin, input);
+
+        if (input.empty())
+            return 0;
+
+        processInput(input);
     }
-    catch (std::out_of_range& e) {
-        std::cout << "Out of range: " << input << "\n";
-    }
-    catch (std::exception& e) {
-        std::cout << "Not convertible: " << input << "\n";
-    }
-  }
-#endif
 
-  return 0;
+    return 0;
 };
